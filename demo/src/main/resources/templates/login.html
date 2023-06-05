@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+    <title>Sign Up / Sign In 1</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"/> 
+    <link rel="stylesheet" type="text/css" th:href="@{css/style.css}">
+</head>
+<script type="text/javascript" th:src="@{/js/home.js}"></script>
+<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+<body class="body">
+
+  <!-- Choose Form -->
+
+    <section class="form-container">
+      <span id="arrowClick" class="form-container__arrow"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+      <div class="overlay"></div>
+      <div class="choose-form">
+        <div class="title">
+          <h1 class="title__h1">Welcome<br>Start for free</h1> 
+        </div>
+        <div class="buttons">
+          <a id="signUp" class="buttons__signup" href="#">Sign up</a>
+          <a id="login" class="buttons__signup buttons__signup--login" href="#">Login</a>  
+        </div>
+      </div> 
+
+  <!-- Login Form -->
+
+      <div class="login-form">
+        <div class="form-wrapper">
+          <form id="loginForm">
+            <label class="form-wrapper__label" for="login-username">ID</label>
+            <input id="login-username" class="form-wrapper__input" type="text" placeholder="ID" name="account" required>
+            <label class="form-wrapper__label" for="login-password">Password</label>
+            <input id="login-password" class="form-wrapper__input" type="password" placeholder="Password" name="password" pattern=".{3,}" title="Password must contain at least 3 characters" required>
+            <a class="login-form__fail-login" href="#"></a>
+            <button class="buttons__signup buttons__signup--login-form" type="button" href="#" onclick="sendLogin()">Login</button>
+          </form>
+
+  <!-- Social-Media -->
+
+          <!-- <div class="social-media">
+            <h6 class="title__h2">Or connect with</h6>
+            <a class="buttons__signup buttons__signup--social" href="#"><i class="fab fa-facebook-f" aria-hidden="true"></i>&nbsp;facebook</a>
+            <a class="buttons__signup buttons__signup--social" href="#"><i class="fab fa-google" aria-hidden="true"></i>&nbsp;google</a>
+          </div> -->
+        </div>
+      </div>
+
+  <!-- Register Form -->
+
+      <div class="login-form login-form--register">
+        <div class="form-wrapper">
+          <form id="RegForm">
+            <label class="form-wrapper__label" for="signup-acc">Account</label>
+            <input id="signup-account" class="form-wrapper__input" type="account" placeholder="id" name="account" required>
+            <label class="form-wrapper__label" for="signup-password">Password</label>
+            <input id="signup-password" class="form-wrapper__input" type="password" placeholder="Password" name="password" pattern=".{3,}" title="Password must contain at least 3 characters" required>
+            <label class="form-wrapper__label" for="signup-nickname">Nickname</label>
+            <input id="signup-nickname" class="form-wrapper__input" type="text" placeholder="Nickname" name="nickname" required>
+            <label class="form-wrapper__label" for="signup-username">Username</label>
+            <input id="signup-username" class="form-wrapper__input" type="text" placeholder="Username" name="name" required>
+            <button class="buttons__signup buttons__signup--sign-up-form" type="button" onclick="sendRegister()">Sign up</button>
+            <label class="form-wrapper__label" for="signup-email">Email</label>
+            <input id="signup-email" class="form-wrapper__input" type="email" placeholder="example@hotmail.com" name="email" required>
+          </form>
+
+  <!-- Social-Media -->
+
+          <!-- 
+          <div class="social-media">
+            <h2 class="title__h2">Or connect with</h2>
+            <a class="buttons__signup buttons__signup--social" href="#"><i class="fab fa-facebook-f" aria-hidden="true"></i>&nbsp;facebook</a>
+            <a class="buttons__signup buttons__signup--social" href="#"><i class="fab fa-google" aria-hidden="true"></i>&nbsp;google</a>
+          </div> 
+          -->
+        </div>
+      </div>
+    </section>  
+     
+  </body>
+  <script type="text/javascript">
+  $.fn.serializeObject = function() {
+	  "use strict"
+	  var result = {}
+	  var extend = function(i, element) {
+	    var node = result[element.name]
+	    if ("undefined" !== typeof node && node !== null) {
+	      if ($.isArray(node)) {
+	        node.push(element.value)
+	      } else {
+	        result[element.name] = [node, element.value]
+	      }
+	    } else {
+	      result[element.name] = element.value
+	    }
+	  }
+
+	  $.each(this.serializeArray(), extend)
+	  return result
+	}
+  
+  
+  	function sendRegister(){
+  		var formData = $("#RegForm").serializeObject(); 
+  		$.ajax({
+  			url:'/register',
+  			type:'POST',
+  			contentType:'application/json',
+  			data: JSON.stringify(formData),
+  			success:function(data){
+  				alert('회원가입이 완료 되었습니다.');
+  				$('#arrowClick').click();
+  			},error:function(status){
+  				console.log('fail')
+  			}
+  		});
+  	}
+  	
+  	function sendLogin(){
+  		var formData = $("#loginForm").serializeObject(); 
+  		console.log(JSON.stringify(formData))
+  		$.ajax({
+  			url:'/login',
+  			type:'POST',
+  			contentType:'application/json',
+  			data: JSON.stringify(formData),
+  			success:function(data){
+  				/* $('#arrowClick').click(); */
+  				/* succLogin(data.token) */
+  				/* localStorage.setItem('jwtToken', 'Bearer '+data.token)*/
+  				/* redirectToNewPage(data.token)  */
+  			},error:function(status){
+  				console.log('fail')
+  				console.log(status.responseText)
+  				$('.login-form__fail-login').text(status.responseText);
+  			}
+  		});
+  	}
+  	
+  	function succLogin(token) {
+  		$.ajax({
+  			url:'/home',
+  			type:'GET',
+  			headers: {
+  		        'Authorization': `Bearer ${token}`,
+  		    },
+  			success:function(data){
+  				console.log(data)
+  			},error:function(status){
+  				console.log('fail')
+  				console.log(status.responseText)
+  				$('.login-form__fail-login').text(status.responseText);
+  			}
+  		});	
+   	}
+ 	// 현재 URL에 헤더 값을 추가하고 페이지 이동
+  	function redirectToNewPage(token) {
+  	var jwtToken = localStorage.getItem("jwtToken");
+  	var xhr = new XMLHttpRequest();
+  	xhr.open('GET', '/home', true);
+  	xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+  	xhr.onreadystatechange = function() {
+  	  if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+  	    // 페이지 로드 완료 후 처리 로직
+  	  }
+  	};
+  	xhr.send();
+  	}
+  	
+  </script>
+</html>
